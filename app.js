@@ -54,9 +54,15 @@ app.post('/save-note', (req, resp) => {
     // lastModified: new Date().toTimeString
   })
   notes.save(error => {
-    if (error) console.log("error occured")
-    else console.log("added successfully", error)
-    resp.send({error: false})
+    if (error) resp.send({status: "error"})
+    else resp.send({status: "success"})
+  })
+})
+
+app.delete('/delete', (req, resp) => {
+  notesModel.findByIdAndDelete(req.body.id, error => {
+    if (error) resp.send({status: "error"})
+    else resp.send({status: "success"})
   })
 })
 
