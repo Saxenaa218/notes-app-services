@@ -59,11 +59,24 @@ app.post('/save-note', (req, resp) => {
   })
 })
 
-app.post('/delete', (req, resp) => {
+app.post('/delete-note', (req, resp) => {
   notesModel.findByIdAndDelete(req.body.id, error => {
     if (error) resp.send({status: "error"})
     else resp.send({status: "success"})
   })
+})
+
+app.put("/update-note", function(req, res) {
+  notesModel.findOneAndUpdate({ _id: req.body.id }, { ...req.body.changes }, function(
+    err,
+    result
+  ) {
+    if (err) {
+      res.send({status: "error"});
+    } else {
+      res.json({result});
+    }
+  });
 })
 
 app.listen(process.env.PORT || 3005)
