@@ -1,14 +1,26 @@
-var express = require('express')
-var cors = require('cors')
-var app = express()
+saveNotes = (req, resp) => {
+    console.log("INNNN----------------------------")
+    const collection = client.db("personal").collection("notes");
+    // console.log(req.body.title)
+    var data = UsersModel({
+        title: req.body.title,
+        desc: req.body.desc
+    })
+    let t;
+    data.save(err => {
+        err ? t = {error: true} : t = {error: false}
+    })
 
-app.use(cors())
+    resp.send({
+        data: {
+            id: "1"
+        },
+        ...t
+    })
+    // client.close();
+}
 
-app.get('/get', (req, resp) => {
-    resp.send({ data: "Hello World" })
-})
-
-app.get('/get-notes', (req, resp) => {
+getNotes = (req, resp) => {
     var notes = [
         {
             id: 1,
@@ -52,6 +64,11 @@ app.get('/get-notes', (req, resp) => {
         }
     ]
     resp.send({ notes: notes })
-})
+}
 
-app.listen(process.env.PORT || 3001)
+const t = {
+    saveNotes,
+    getNotes
+};
+
+export default t;

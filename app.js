@@ -13,7 +13,7 @@ app.use(morgan('tiny'))
 const uri = "mongodb+srv://abhisheks:admin@cluster0.gr3w7.mongodb.net/personal?retryWrites=true&w=majority";
 
 // schema defining
-const Schema = mongoose.Schema
+const { Schema } = mongoose
 const notesSchema = new Schema({
   title: String,
   desc: String,
@@ -35,15 +35,13 @@ mongoose.connection.on('connected', () => {
 })
 
 // routes
-app.get('/get-notes', async (req, resp) => {
-  let response;
-  await notesModel.find({}).then(data => {
-    response = data
+app.get('/get-notes', (req, resp) => {
+  notesModel.find({}).then(data => {
+    resp.send({ notes: data, error: false })
   })
   .catch(err => {
-    response = []
+    resp.send({ notes: [], error: true })
   })
-  resp.send({ notes: response })
 })
 
 app.post('/save-note', (req, resp) => {
@@ -51,11 +49,11 @@ app.post('/save-note', (req, resp) => {
   const notes = new notesModel({
     title,
     desc,
-    // lastModified: new Date().toTimeString
+    // lastModified: new Date().toTimeString()
   })
   notes.save(error => {
     if (error) resp.send({status: "error"})
-    else resp.send({status: "success"})
+    else resp.send({status: "success", notes})
   })
 })
 
@@ -66,11 +64,8 @@ app.post('/delete-note', (req, resp) => {
   })
 })
 
-app.put("/update-note", function(req, res) {
-  notesModel.findOneAndUpdate({ _id: req.body.id }, { ...req.body.changes }, function(
-    err,
-    result
-  ) {
+app.put("/update-note", (req, res) => {
+  notesModel.findOneAndUpdate({ _id: req.body.id }, { ...req.body.changes }, (err, result) => {
     if (err) {
       res.send({status: "error"});
     } else {
